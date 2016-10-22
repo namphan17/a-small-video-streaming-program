@@ -2,6 +2,11 @@
 
 import java.io.*;
 
+/**
+ * This class is used to read video data from the file on disk.
+ * @author http://media.pearsoncmg.com/aw/aw_kurose_network_3/labs/lab7/Client.html
+ * @version 10/21/2016
+ */
 public class VideoStream {
 
   FileInputStream fis; //video file
@@ -10,7 +15,11 @@ public class VideoStream {
   //-----------------------------------
   //constructor
   //-----------------------------------
-  public VideoStream(String filename) throws Exception{
+  /**
+ * @param filename
+ * @throws Exception
+ */
+public VideoStream(String filename) throws Exception{
 
     //init variables
     fis = new FileInputStream(filename);
@@ -21,7 +30,12 @@ public class VideoStream {
   // getnextframe
   //returns the next frame as an array of byte and the size of the frame
   //-----------------------------------
-  public int getnextframe(byte[] frame) throws Exception
+  /**
+ * @param frame
+ * @return
+ * @throws Exception
+ */
+public int getnextframe(byte[] frame) throws Exception
   {
     int length = 0;
     String length_string;

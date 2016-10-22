@@ -1,4 +1,9 @@
 
+/**
+ * This class is used to handle the RTP packets.
+ * @author http://media.pearsoncmg.com/aw/aw_kurose_network_3/labs/lab7/Client.html
+ * @version 10/21/2016
+ */
 public class RTPpacket {
 
 	// size of RTP header:
@@ -27,6 +32,13 @@ public class RTPpacket {
 	// Constructor of an RTPpacket object from header fields and payload
 	// bitstream
 	// --------------------
+	/**
+	 * @param PType
+	 * @param Framenb
+	 * @param Time
+	 * @param data
+	 * @param data_length
+	 */
 	public RTPpacket(int PType, int Framenb, int Time, byte[] data, int data_length) {
 		// fill by default header fields
 		Version = 2;
@@ -68,6 +80,10 @@ public class RTPpacket {
 	// --------------------------
 	// Constructor of an RTPpacket object from the packet bitstream
 	// --------------------------
+	/**
+	 * @param packet
+	 * @param packet_size
+	 */
 	public RTPpacket(byte[] packet, int packet_size) {
 		// fill default fields:
 		Version = 2;

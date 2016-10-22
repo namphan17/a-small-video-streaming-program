@@ -28,6 +28,12 @@ import java.util.StringTokenizer;
 
 import javax.swing.ImageIcon;
 
+/**
+ * This class implements the client and the user interface which you 
+ * use to send RTSP commands and which is used to display the video.
+ * @author http://media.pearsoncmg.com/aw/aw_kurose_network_3/labs/lab7/Client.html
+ * @version 10/21/2016
+ */
 public class Client {
 
 	// GUI
@@ -77,6 +83,9 @@ public class Client {
 	// -------------------
 	// Constructor
 	// -------------------
+	/**
+	 * 
+	 */
 	public Client() {
 
 		// build GUI
@@ -138,14 +147,20 @@ public class Client {
 		InetAddress ServerIPAddr = InetAddress.getByName(ServerHost);
 		theClient.VideoFileName = argv[2];
 
+		
 		// Establish a TCP connection with the server to exchange RTSP messages
 		// ---------------
 		theClient.RTSPsocket = new Socket(ServerIPAddr, RTSP_server_port);
 
 		// Set input and output stream filters:
 		RTSPBufferedReader = new BufferedReader(new InputStreamReader(theClient.RTSPsocket.getInputStream()));
-		RTSPBufferedWriter = 	new BufferedWriter(new OutputStreamWriter(theClient.RTSPsocket.getOutputStream()));
+		RTSPBufferedWriter = new BufferedWriter(new OutputStreamWriter(theClient.RTSPsocket.getOutputStream()));
 
+		System.out.println("HERE");
+		//------------------
+		// TESTING
+		//System.out.println(new OutputStreamWriter(theClient.RTSPsocket.getOutputStream()));
+		
 		// init RTSP state:
 		state = INIT;
 	}
@@ -163,31 +178,28 @@ public class Client {
 			System.out.println("Setup Button pressed!");
 
 			if (state == INIT) {
-				// Init non-blocking RTPsocket that will be used to receive
-				try {
-					// construct a new DatagramSocket to receive RTP packets
-					// from the server,
-					// on port RTP_RCV_PORT
-
-					RTPsocket = new DatagramSocket(RTP_RCV_PORT);
-
-					// set TimeOut value of the socket to 5msec
-					RTPsocket.setSoTimeout(5);
-				} catch (SocketException se) {
-					System.out.println("Socket exception: " + se);
-					System.exit(0);
-				}
-
+				
 				// init RTSP sequence number
 				RTSPSeqNb = 1;
 
 				// Send SETUP message to the server
 				send_RTSP_request("SETUP");
-
+				System.out.println("Request sent");
 				// Wait for the response
+				System.out.println("Waiting for the response");
+				
 				if (parse_server_response() != 200) {
 					System.out.println("Invalid Server Response");
 				} else {
+					try {
+						RTPsocket = new DatagramSocket(RTP_RCV_PORT);
+						
+						System.out.println("Socket created at: " + RTP_RCV_PORT);		// Debugging
+						// set TimeOut value of the socket to 5msec
+						RTPsocket.setSoTimeout(5);
+					} catch (Exception se) {
+						System.out.println("BOOM");
+					}
 					// Change RTSP state and print out new state
 					state = READY;
 					System.out.println("New RTSP state: " + READY);
@@ -294,7 +306,9 @@ public class Client {
 			try {
 				// receive the DP from the socket:
 				RTPsocket.receive(rcvdp);
-
+				
+				System.out.println("receiving packets"); 				// Debugging
+				
 				// create an RTPpacket object from DP
 				RTPpacket rtp_packet = new RTPpacket(rcvdp.getData(), rcvdp.getLength());
 
@@ -328,6 +342,9 @@ public class Client {
 	//----------------------------
 	//Parse Server Response
 	//----------------------------
+	/**
+	 * @return
+	 */
 	private int parse_server_response() {
 		int reply_code = 0;
 		
@@ -366,25 +383,29 @@ public class Client {
 	//Send RTSP request
 	//-----------------------
 	
+	/**
+	 * @param request_byte
+	 */
 	private void send_RTSP_request(String request_byte) {
 		try {
 			//Use the RTSPBufferedWriter to write to the RTSP socket
 			
 			//write the request line:
-			RTSPBufferedWriter.write(request_byte + " VideoFileName" + "RTSP/1.0" + CRLF);
-			
+			RTSPBufferedWriter.write(request_byte + " movie.Mjpeg " + "RTSP/1.0 " + CRLF);
+			System.out.println(request_byte + " movie.Mjpeg " + "RTSP/1.0 " + CRLF);				// Debugging
+			System.out.println("CSeq: " + RTSPSeqNb + " " + CRLF);		// Debugging
 			//write the CSeq line:
-			RTSPBufferedWriter.write("CSeq: " + RTSPSeqNb + CRLF);
+			RTSPBufferedWriter.write("CSeq: " + RTSPSeqNb + " " + CRLF);
 			
 			//check if request_type is equal to "SETUP" and in this case
 			//write the Transport: line advertising to the server the port
 			//used to receive the RTP packets RTP_RCV_PORT
 			if (request_byte == "SETUP") {
-				RTSPBufferedWriter.write("Transport: RTP/UDP; client_port= " + RTP_RCV_PORT + CRLF);
+				RTSPBufferedWriter.write("Transport: RTP/UDP; client_port= " + RTP_RCV_PORT + " " + CRLF);
+				System.out.println("Transport: RTP/UDP; client_port= " + RTP_RCV_PORT + " " + CRLF); 		//Debugging
 			} else {
 				RTSPBufferedWriter.write("Session: " + RTSPid);
-			}
-			//otherwise, write the Session line from the RTSPid field
+			} //otherwise, write the Session line from the RTSPid field
 			
 			RTSPBufferedWriter.flush();
 		}

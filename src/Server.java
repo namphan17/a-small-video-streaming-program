@@ -11,6 +11,11 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.Timer;
 
+/**
+ * This class implements the server which responds to the RTSP requests and streams back the video.
+ * @author http://media.pearsoncmg.com/aw/aw_kurose_network_3/labs/lab7/Client.html
+ * @version 10/21/2016
+ */
 public class Server extends JFrame implements ActionListener {
 
 	// RTP variables:
@@ -64,6 +69,9 @@ public class Server extends JFrame implements ActionListener {
 	// --------------------------------
 	// Constructor
 	// --------------------------------
+	/**
+	 * 
+	 */
 	public Server() {
 
 		// init Frame
@@ -107,7 +115,12 @@ public class Server extends JFrame implements ActionListener {
 
 		// Initiate TCP connection with the client for the RTSP session
 		ServerSocket listenSocket = new ServerSocket(RTSPport);
+		
+		System.out.println("Waiting...");							// Debugging
+		
 		theServer.RTSPsocket = listenSocket.accept();
+		
+		System.out.println("Accepting connection");  				// Debugging
 		listenSocket.close();
 
 		// Get Client IP address
@@ -125,7 +138,8 @@ public class Server extends JFrame implements ActionListener {
 		boolean done = false;
 		while (!done) {
 			request_type = theServer.parse_RTSP_request(); // blocking
-
+			System.out.println(request_type);  											//Debugging
+		
 			if (request_type == SETUP) {
 				done = true;
 
@@ -227,12 +241,18 @@ public class Server extends JFrame implements ActionListener {
 	// ------------------------------------
 	// Parse RTSP Request
 	// ------------------------------------
+	/**
+	 * @return
+	 */
 	private int parse_RTSP_request() {
+		System.out.println("Parsing request method");							// Debugging
 		int request_type = -1;
 		try {
 			// parse request line and extract the request_type:
+			System.out.println("Reading line from buffered reader"); 											// Debugging
+			System.out.println(RTSPBufferedReader);
 			String RequestLine = RTSPBufferedReader.readLine();
-			// System.out.println("RTSP Server - Received from Client:");
+//			 System.out.println("RTSP Server - Received from Client:");
 			System.out.println(RequestLine);
 
 			StringTokenizer tokens = new StringTokenizer(RequestLine);
@@ -283,6 +303,9 @@ public class Server extends JFrame implements ActionListener {
 	// ------------------------------------
 	// Send RTSP Response
 	// ------------------------------------
+	/**
+	 * 
+	 */
 	private void send_RTSP_response() {
 		try {
 			RTSPBufferedWriter.write("RTSP/1.0 200 OK" + CRLF);
